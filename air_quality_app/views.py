@@ -48,7 +48,7 @@ def get_latest_data(request):
     gc = gspread.authorize(credentials)
 
     # Open the Google Spreadsheet
-    sheet = gc.open_by_key('1mP9WSk7vjEvtydIyB9BHtUEn1J8uzVFfcCVk1jzQBng').sheet1  # Replace 'Your Spreadsheet Name' with actual name
+    sheet = gc.open_by_key('YOUR_SHEET_ID').sheet1  # Replace 'Your Spreadsheet Name' with actual name
 
     # Get the latest 30 rows from the spreadsheet
     latest_rows = sheet.get_all_records()[-30:]
