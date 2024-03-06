@@ -13,13 +13,6 @@ from oauth2client.service_account import ServiceAccountCredentials
 from django.http import JsonResponse
 from googleapiclient.discovery import build
 
-# def get_spreadsheet_data(request):
-#     # Replace 'YOUR_SPREADSHEET_ID' with the ID of your Google Spreadsheet
-#     spreadsheet_id = '1-9LkXc34ncvVXBQpWJvw826DVRittXDU7FSH5GV3NcQ'
-
-#     # Replace 'YOUR_API_KEY' with your API key
-#     api_key = 'AIzaSyAtYKI-paVsxlZbOsuIEuDAcLFFWXCzg0Q'
-
 #     # Construct the service object for interacting with the Google Sheets API
 #     service = build('sheets', 'v4', developerKey=api_key)
 
