@@ -11,6 +11,36 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import json
+from dotenv import load_dotenv
+# settings.py
+import os
+
+GOOGLE_SHEETS_CREDENTIALS_FILE = './credentials.json'
+
+# Scope required for accessing Google Sheets API
+GOOGLE_SHEETS_SCOPE = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+
+# Read the credentials from the JSON file
+with open(GOOGLE_SHEETS_CREDENTIALS_FILE, 'r') as f:
+    GOOGLE_SHEETS_CREDENTIALS = json.load(f)
+
+# Additional settings for gspread authentication
+GSHEET_AUTH = {
+    "type": GOOGLE_SHEETS_CREDENTIALS['type'],
+    "project_id": GOOGLE_SHEETS_CREDENTIALS['project_id'],
+    "private_key_id": GOOGLE_SHEETS_CREDENTIALS['private_key_id'],
+    "private_key": GOOGLE_SHEETS_CREDENTIALS['private_key'],
+    "client_email": GOOGLE_SHEETS_CREDENTIALS['client_email'],
+    "client_id": GOOGLE_SHEETS_CREDENTIALS['client_id'],
+    "auth_uri": GOOGLE_SHEETS_CREDENTIALS['auth_uri'],
+    "token_uri": GOOGLE_SHEETS_CREDENTIALS['token_uri'],
+    "auth_provider_x509_cert_url": GOOGLE_SHEETS_CREDENTIALS['auth_provider_x509_cert_url'],
+    "client_x509_cert_url": GOOGLE_SHEETS_CREDENTIALS['client_x509_cert_url']
+}
+
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +56,7 @@ SECRET_KEY = 'django-insecure-cwzntmzc5$8g-y+i06f-u9hy!@v*x%qqwn@8t80zri9gtub-w$
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Application definition
 
@@ -38,6 +68,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'air_quality_app',
+     'corsheaders',
 
 ]
 
@@ -49,6 +80,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+      'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'air_quality_measurment.urls'
@@ -126,4 +158,4 @@ STATIC_URL = 'static/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField' # Starting the gspread client when our server starts speeds things up; it avoids re-authenticating on each request

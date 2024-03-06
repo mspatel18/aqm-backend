@@ -1,12 +1,71 @@
 from django.http import JsonResponse
+from django.shortcuts import render
 from .models import AirQualityData
 from datetime import timedelta
 from django.utils import timezone
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 # def predict_air_quality(request):
 #     # Implement your prediction logic here
 #     predicted_data = {'particulate_matter': 25.6, 'carbon_monoxide': 1.8}
     # return JsonResponse(predicted_data)
 
+from django.http import JsonResponse
+from googleapiclient.discovery import build
+
+# def get_spreadsheet_data(request):
+#     # Replace 'YOUR_SPREADSHEET_ID' with the ID of your Google Spreadsheet
+#     spreadsheet_id = '1-9LkXc34ncvVXBQpWJvw826DVRittXDU7FSH5GV3NcQ'
+
+#     # Replace 'YOUR_API_KEY' with your API key
+#     api_key = 'AIzaSyAtYKI-paVsxlZbOsuIEuDAcLFFWXCzg0Q'
+
+#     # Construct the service object for interacting with the Google Sheets API
+#     service = build('sheets', 'v4', developerKey=api_key)
+
+#     # Specify the range of data you want to retrieve
+#     range_name = 'Sheet1!A1:B10'
+
+#     try:
+#         # Make a request to retrieve data from the spreadsheet
+#         result = service.spreadsheets().values().get(spreadsheetId=spreadsheet_id, range=range_name).execute()
+
+#         # Process the data
+#         values = result.get('values', [])
+#         return JsonResponse({'data': values})
+#     except Exception as e:
+#         # Handle any errors
+#         return JsonResponse({'error': str(e)}) 
+def get_latest_data(request):
+    # Path to the credentials JSON file obtained from Google Cloud Console
+    credentials_file = './credentials.json'
+
+    # Scope required for accessing Google Sheets API
+    scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+
+    # Authenticate using the credentials file
+    credentials = ServiceAccountCredentials.from_json_keyfile_name(credentials_file, scope)
+    gc = gspread.authorize(credentials)
+
+    # Open the Google Spreadsheet
+    sheet = gc.open_by_key('1mP9WSk7vjEvtydIyB9BHtUEn1J8uzVFfcCVk1jzQBng').sheet1  # Replace 'Your Spreadsheet Name' with actual name
+
+    # Get the latest 30 rows from the spreadsheet
+    latest_rows = sheet.get_all_records()[-30:]
+
+    # Format the data as needed
+    data = []
+    for row in latest_rows:
+        data.append({
+            'timestamp': row['data'],
+            'carbon_monoxide':row['sensor'],
+            # 'carbon_monoxide': row['carbon_monoxide'],
+            # 'particulate_matter': row['particulate_matter'],
+            # 'nitrogen_dioxide': row['nitrogen_dioxide']
+        })
+
+    # Return the data as JSON response
+    return JsonResponse(data, safe=False)
 def get_current_air_quality(request):
     latest_data = AirQualityData.objects.latest('timestamp')
     current_data = {
